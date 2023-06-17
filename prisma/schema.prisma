@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+//Declaring models
+model Voters {
+  studentId   String   @id @map("_id")
+  studentName String
+  email       String
+  telephone   String?
+  password    String
+  del_flag    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  voting      Voting[]
+}
+
+model Positions {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  positionName String
+  description  String?
+  del_flag     Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  candidate    Candidates[]
+  voting       Voting[]
+}
+
+model Candidates {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  candidateName String
+  telePhone     String?
+  profile       String?
+  positions     Positions @relation(fields: [positionsId], references: [id])
+  positionsId   String    @db.ObjectId
+  voting        Voting[]
+}
+
+model Voting {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  candidates  Candidates @relation(fields: [candidateId], references: [id])
+  candidateId String     @db.ObjectId
+  positions   Positions  @relation(fields: [positionsId], references: [id])
+  positionsId String     @db.ObjectId
+  voters      Voters     @relation(fields: [votersId], references: [studentId])
+  votersId    String
+  //  no @db.ObjectId because it will be typed by the user
+}
+
+// candidate _id
+// position 
+// voter id
